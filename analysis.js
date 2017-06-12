@@ -3,6 +3,18 @@ const Device   = require('tago/device');
 const Utils    = require('tago/utils');
 
 /**
+* Function to convert a string number from MQTT to Number
+* Return string if it is not a number
+*/
+function parseValue(value) {
+  const number = Number(value);
+  if (Number.isNaN(number)) {
+    return value;
+  }
+  return number;
+}
+
+/**
 * Main function called by tago analysis
 */
 function sensorTagParse(context, scope) {
@@ -22,7 +34,7 @@ function sensorTagParse(context, scope) {
   data = Object.keys(data).map(x => {
     return {
       variable: x,
-      value: data[x],
+      value: parseValue(data[x]),
       serie: String(serie)
     };
   })
