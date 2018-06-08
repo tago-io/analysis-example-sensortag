@@ -2,14 +2,11 @@ const Analysis = require('tago/analysis');
 const Device   = require('tago/device');
 const Utils    = require('tago/utils');
 
-/**
-* Main function called by tago analysis
-*/
-function sensorTagParse(context, scope) {
-  // Use tago library to convert the environment variables to json
-  // and check if the variables are correct
-  const env_var = Utils.env_to_obj(context.environment);
-  if (!env_var.device_token) return context.log('Was not possible to found device_token in the environment variable');
+// The function myAnalysis will run when you execute your analysis
+function myAnalysis(context, scope) {
+  // reads the values from the environment and saves it in the variable env_vars
+  const env_vars = Utils.env_to_obj(context.environment);
+  if (!env_vars.device_token) return context.log('The device_token was not found in the environment variables');
 
   // Try to find the payload in the scope. Scope is passed by MQTT to the analysis
   let payload;
@@ -19,7 +16,7 @@ function sensorTagParse(context, scope) {
     return context.log(error);
   }
 
-  if (!payload) return context.log('Cant find variable "payload" in scope. Try running the analysis using actions');
+  if (!payload) return context.log('Cant find variable "payload" in the scope. Try running the analysis using actions');
 
 
   // create a new serie based in date time
@@ -47,10 +44,10 @@ function sensorTagParse(context, scope) {
   });
 
   // Create the device object using the environment variable device_token
-  const mydevice = new Device(env_var.device_token);
+  const mydevice = new Device(env_vars.device_token);
 
-  // Insert payload and return its succesfull or fail to the tago analyisis
+  // Insert the payload and return the result to Tago Analysis console
   mydevice.insert(payload).then(context.log).catch(context.log);
 }
 
-module.exports = new Analysis(sensorTagParse, 'YOUR-ANALYSIS-TOKEN-HERE');
+module.exports = new Analysis(myAnalysis, 'YOUR-ANALYSIS-TOKEN-HERE');
